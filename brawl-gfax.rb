@@ -20,97 +20,113 @@ class Brawl
       'block'                    => { type: :counter,
                                       display: 'Block', 
                                       string: "%{p} blocks %{o}'s %{c}.",
-                                      help: "Block a basic attack card when played against you. Can be used against a grab to nullify the grab's proceeding attack."
+                                      help: "Block a basic attack card when played against you. Can be used against a grab to nullify the grab's proceeding attack.",
+                                      qty: 6
                                     },
                           
       'dodge'                    => { type: :counter,
                                       display: 'Dodge', 
                                       string: "%{p} dodges %{o}'s %{c}.",
                                       help: "Similar to a block, but the attack is passed onto the next player. Cannot counter a grab.",
-                                      regex: /wet( pillow)?/
+                                      regex: /wet( pillow)?/,
+                                      qty: 6
                                     },
                           
       'grab'                     => { type: :counter,
                                       display: 'Grab',
                                       string: "%{p} grabs %{o}. Respond or pass, %{o}.",
                                       help: "Play this as a counter so you can attack back. This cannot be dodged. Also note this can be played before an attack to disguise your type of attack.", 
-                                      regex: /credit( feed)?/
+                                      regex: /credit( feed)?/,
+                                      qty: 8
                                     },
                           
-      'wet_pillow'               => { type: :counter, 
+      'wet pillow'               => { type: :counter, 
                                       health: 2,
                                       display: 'Wet Pillow', 
                                       string: "The wet pillow descends from heaven to shield %{p}.",
-                                      help: "Can only be used against a blockable killing blow. Resets you to 5 health points."
+                                      help: "Can only be used against a blockable killing blow. Resets you to 5 health points.",
+                                      qty: 3
                                     },
                           
-      'credit_feed'              => { type: :counter, 
+      'credit feed'              => { type: :counter, 
                                       health: 5,
                                       display: 'Credit Feed', 
                                       string: "%{p} feeds me some credits and is restored to 5 health!",
-                                      help: "This does no damage, but your opponent must spend 2 turns in therapy."
+                                      help: "Can only be used against a blockable killing blow. Resets you to 5 health points.",
+                                      qty: 2
                                     },
                           
-      'roach_approach'           => { type: :attack,
+      'roach approach'           => { type: :attack,
                                       skips: 2,
                                       display: 'Roach Approach',
                                       string: "%{p} psychologically devastates %{o} with a Roach approach.", 
-                                      regex: /roach( approach)?/ },
+                                      help: "This does no damage, but your opponent must spend 2 turns in therapy.",                                      
+                                      regex: /roach( approach)?/,
+                                      qty: 2
+                                    },
                           
       'broken heart'             => { type: :attack,
                                       health: -2,
                                       skips: 1,
                                       string: "%{o} watches Jurassic Bark. :'(",
                                       help: "Opponent must watch Jurassic Bark, lose 2 health, and a turn.", 
-                                      regex: [ /broken( heart)?/, /jurr*ass*ic( ?bark)?/, 'heart', 'bark' ]
+                                      regex: [ /broken( heart)?/, /jurr*ass*ic( ?bark)?/, 'heart', 'bark' ],
+                                      qty: 3
                                     },
                           
       'gutpunch'                 => { type: :attack,
                                       health: -2,
                                       string: "A wild TODD appears and gutpunches %{o}.",
                                       help:  'Basic TODD-inspired technique.',
-                                      regex: [ /gut( ?punch)?/, 'punch' ]
+                                      regex: [ /gut( ?punch)?/, 'punch' ],
+                                      qty: 10
                                     },
 
       'chihiro'                  => { type: :attack,
                                       health: -3,
                                       skips: 1,
                                       string: "Chihiro claws %{o} in an excited rage. She pees a little.",
-                                      help: "Chihiro claws your opponent in an excited rage. She pees a little. Opponent loses a turn to clean it up."
+                                      help: "Chihiro claws your opponent in an excited rage. She pees a little. Opponent loses a turn to clean it up.",
+                                      qty: 2
                                     },
         
       'neck punch'               => { type: :attack,
                                       health: -3,
                                       string: "%{p} delivers %{o} a punch in the neck.",
                                       help: "Slightly more powerful attack directed at the neck of your opponent.",
-                                      regex: /neck( ?punch)?/
+                                      regex: /neck( ?punch)?/,
+                                      qty: 10
                                     },
 
       'kickball'                 => { type: :attack,
                                       health: -4,
                                       string: lambda { "%{p} delivers %{o}'s %s a swift kick." %  [ "toolbox", "mulberry bush", "weed whacker", "particle accelerator", "anodes", "anchors", "Jimmy Deans", "coat rack", "balls" ].sample },
                                       regex: /kick( ?ball)?/,
-                                      help: "#{y}Kickball#{c} (-4) - Major damage due to a swift kick in the balls. Can be used on players that don't have balls."
+                                      help: "Major damage due to a swift kick in the balls. Can be used on players that don't have balls.",
+                                      qty: 7
                                     },
 
       'touch'                    => { type: :attack,
                                       health: -5,                                      
                                       string: "%{o} receives a touch from LordKaT.",
                                       regex: 'touch',
-                                      help: "#{y}Touch#{c} (-5) - LordKaT appears to deliver an ultimate attack."
+                                      help: "LordKaT appears to deliver an ultimate attack.",
+                                      qty: 5
                                     },
 
       'slot machine'             => { type: :attack,
                                       string: "Next time stick to the pachinkos, %{o}.",
                                       regex: [ /slot( ?machine)?/, 'machine' ],
-                                      help: "#{o}Slot Machine#{c} (-0 to -9) - Spits out three random attack values from 0 to 3. Attack does the sum of the three numbers. Can't be blocked."
+                                      help: "Spits out three random attack values from 0 to 3. Attack does the sum of the three numbers. Can't be blocked.",
+                                      qty: 2
                                     },
 
       'looke out'                => { type: :unstoppable,
                                       skips: 1,
                                       string: "%{o} catches word of Looke is coming to town and decides to wait around.",
                                       regex: /looke( ?out)?/,
-                                      help: "#{o}Looke Out#{c} (-0) - Looke's in town! He Says he's going to visit. Opponent loses a turn to wait for him. (He never comes.)"
+                                      help: "Looke's in town! He Says he's going to visit. Opponent loses a turn to wait for him. (He never comes.)",
+                                      qty: 2
                                     },
 
       'danger zone'              => { type: :unstoppable,
@@ -118,120 +134,139 @@ class Brawl
                                       skips: -1,
                                       string: "%{p} leaves Danger Zone on repeat and forever ruins %{o}'s last.fm profile.",
                                       regex: [ /danger( ?zone)?/, 'zone' ],
-                                      help: "#{o}Danger Zone#{c} (-1) - Roach scrobbles Danger Zone 570 times on your opponent's computer and now their music libraries are SUPER."
+                                      help: "Roach scrobbles Danger Zone 570 times on your opponent's computer and now their music libraries are SUPER.",
+                                      qty: 2
                                     },
 
       'a gun'                    => { type: :unstoppable,
                                       health: -2,
                                       string: "%{p} shoots %{o} in the FACE.",
                                       regex: /(a ?)gun/,
-                                      help: "#{o}A Gun#{c} (-2) - Can't dodge a gun. Simple as that."
+                                      help: "Can't dodge a gun. Simple as that.",
+                                      qty: 2
                                     },
 
       'rocket lawn chair'        => { type: :unstoppable,
                                       health: -3,
                                       string: "%{p} blows up %{o} with a Rocket Lawn Chair.",
                                       regex: [ /rocket(( ?lawn)? ?chair)?/, 'lawn', 'chair' ],
-                                      help: "#{o}Rocket Lawn Chair#{c} (-3) - Still not as good as shotgun."
+                                      help: "Still not as good as shotgun.",
+                                      qty: 1
                                     },
       
       'flipper'                  => { type: :unstoppable,
                                       string: lambda { rand(2) == 0 ? "%{p} flips over the table, knocking all the cards out of %{o}'s hand." 
                                                                     : "%{p} violently SLAPS the cards out of %{o}'s hand for no raisin." },
                                       regex: /flippers?/,
-                                      help: "#{o}Flipper#{c} (-0) - Opponent drops all their cards and draws new ones."
+                                      help: "Opponent drops all their cards and draws new ones.",
+                                      qty: 1
                                     },
 
       'garbage man'              => { type: :unstoppable,
                                       string: "%{p} dumps a bunch of garbage cards on %{o}.",
                                       regex: [ /garbage( ?man)?/, 'man' ],
-                                      help: "#{o}Garbage Man#{c} (-0) - Give a player all your cards you don't want. The opponent won't get any new cards until they manage to get their hand below 5 cards again."
+                                      help: "Give a player all your cards you don't want. The opponent won't get any new cards until they manage to get their hand below 5 cards again.",
+                                      qty: 1
                                     },
 
       'heal steal'               => { type: :unstoppable,
                                       string: "%{p} rummages through %{o}'s hand for DDP and peelz." ,
                                       regex: [ /peel( ?steal)?/, 'steal' ],
-                                      help: "#{o}Heal Steal#{c} (+0 to +#{MAX_HP-1}) - Steal all of an opponent's DDP and peels, if he has any, and use them on yourself."
+                                      help: "Steal all of an opponent's DDP and peels, if he has any, and use them on yourself.",
+                                      qty: 2
                                     },
 
       'ddp'                      => { type: :support,
                                       health: 1,
                                       string: "%{p} takes a sip of DDP, relaxes.",
-                                      help: "Take a sip. Relax. Gain health."
+                                      help: "Take a sip. Relax. Gain health.",
+                                      qty: 3
                                     },
 
       'peelz'                    => { type: :support,
                                       health: 2,
                                       string: "%{p} peel'd up!",
                                       regex: /peel(s|z)/,
-                                      help: "#{t}Peelz#{c} (+2) - Heal yourself by 2 points, up to a maximum of #{MAX_HP}. Can be played instead of attacking."
+                                      help: "Heal yourself by 2 points, up to a maximum of #{MAX_HP}. Can be played instead of attacking.",
+                                      qty: 8
                                     },
                  
       'armor'                    => { type: :support,
                                       health: 5,
                                       string: "%{p} buckles on some armor.",
                                       regex: 'armor',
-                                      help: "Adds 5 extra points to your health on top of your maximum. Your main HP will be protected until the armor is depleted."
+                                      help: "Adds 5 extra points to your health on top of your maximum. Your main HP will be protected until the armor is depleted.",
+                                      qty: 1
                                     },
 
       'white wedding'            => { type: :support,
                                       health: MAX_HP - 1,
                                       string: "It's a nice day to... START AGAIN!!! HEALTH RESTORED!!!",
                                       regex: [ /white( ?wedding)?/, 'wedding' ],
-                                      help: "It's a nice day to... START AGAIN!!!! HEALTH RESTORED!!! (can only be used if you have exactly 1 health remaining)"
+                                      help: "It's a nice day to... START AGAIN!!!! HEALTH RESTORED!!! (can only be used if you have exactly 1 health remaining)",
+                                      qty: 2
                                     },
 
       'deflector'                => { type: :power,
                                       string: "%{p} raises a deflector shield!",
                                       regex: /deflect(ed|or|ing|s)?/,
-                                      help: "Next attack played against you hurts a random player that isn't you."
+                                      help: "Next attack played against you hurts a random player that isn't you.",
+                                      qty: 1
                                     },
 
       'ffffff'                   => { type: :power,
                                       health: -6,
                                       string: "%{p} randomly inflicts 6 damage on %{o}. What a dick!" ,
                                       regex: /f+/,
-                                      help: "#{b}FFFFFF#{c} - Inflicts 6 damage to a random player (including you)."
+                                      help: "Inflicts 6 damage to a random player (including you).",
+                                      qty: 1
                                     },
 
       'fireball'                 => { type: :power,
                                       health: -1,
-                                      string: "%{p} drops a fireball on everyone."
+                                      string: "%{p} drops a fireball on everyone.",
+                                      qty: 1
                                     },
 
       'it\'s getting windy'      => { type: :power,
                                       string: "%{p} turns up the ceiling fan too high and blows up  a gust! Every player passes a random card forward.",
                                       regex: [ /it\'?s(( ?getting)? ?windy)?/, 'getting', 'windy' ],
-                                      help: "#{b}It's Getting Windy#{c} - All players choose a random card from the player previous to them."
+                                      help: "All players choose a random card from the player previous to them.",
+                                      qty: 1
                                     },
 
       'multi-ball'               => { type: :power,
                                       string: "%{p} lites multi-ball.",
                                       regex: [ /multi-?( ?ball)?/, 'ball' ],
-                                      help: "#{b}Multi-ball#{c} - Take an extra turn after your turn."
+                                      help: "Take an extra turn after your turn.",
+                                      qty: 1
                                     },
 
       'shifty business'          => { type: :power,
                                       string: "%{p} swaps hands with %{o}!",
                                       regex: [ /shifty( ?business)?/, 'business' ],
-                                      help: "#{b}Shifty Business#{c} - Swap hand cards with a random player."
+                                      help: "Swap hand cards with a random player.",
+                                      qty: 1
                                     },
 
       'the bees'                 => { type: :power,
                                       string: "%{p} drops the bee cage on %{o}'s head...",
                                       regex: [ /the( ?bee*s)?/, 'bee*s' ],
-                                      help: "#{b}THE BEES#{c} - Random player is stung by bees and must do their best Nicholas Cage impression. Also, -1 health every turn until player uses a support card."
+                                      help: "Random player is stung by bees and must do their best Nicholas Cage impression. Also, -1 health every turn until player uses a support card.",
+                                      qty: 1
                                     },
 
       'whirlwind'                => { type: :power,
                                       string: "FEEL THE POWER OF THE WIND",
-                                      help: "Every player shifts the cards in their hands over to the player beside them."
+                                      help: "Every player shifts the cards in their hands over to the player beside them.",
+                                      qty: 1
                                     },
                      
       'you\'re your grandfather' => { type: :power,
                                       string: "%{p} reverses the table!",
                                       regex: [ /you('?re|r)(( ?you('?re|r))?( ?grand(father|pa))?)?/, /grand(father|pa)/ ],
-                                      help: "#{b}You're Your Grandfather#{c} - Time is moving backwards! REVERSE playing order."
+                                      help: "Time is moving backwards! REVERSE playing order.",
+                                      qty: 1
                                     },
     }  
 
@@ -247,6 +282,10 @@ class Brawl
       @skips   = DECK[@id][:skips]  || 0
       @string  = DECK[@id][:string].is_a?(String) ? DECK[@id][:string] : DECK[@id][:string].call
       @type    = DECK[@id][:type]
+    end
+    
+    def display
+      @display || name.capitalize
     end
 
     def color
@@ -353,54 +392,8 @@ class Brawl
   end
 
   def create_deck
-    10.times do
-      @deck << Card.new('gutpunch')
-      @deck << Card.new('neck punch')
-    end
-    8.times do
-      @deck << Card.new('grab')
-      @deck << Card.new('peelz')
-    end
-    7.times do
-      @deck << Card.new('kickball')
-    end
-    6.times do
-      @deck << Card.new('block')
-      @deck << Card.new('dodge')
-    end
-    5.times do
-      @deck << Card.new('touch')
-    end
-    3.times do
-      @deck << Card.new('broken heart')
-      @deck << Card.new('ddp')
-      @deck << Card.new('wet pillow')
-    end
-    2.times do
-      @deck << Card.new('a gun')
-      @deck << Card.new('danger zone')
-      @deck << Card.new('chihiro')
-      @deck << Card.new('credit feed')
-      @deck << Card.new('looke out')
-      @deck << Card.new('heal steal')
-      @deck << Card.new('roach approach')
-      @deck << Card.new('slot machine')
-      @deck << Card.new('white wedding')
-    end
-    1.times do
-      @deck << Card.new('armor')
-      @deck << Card.new('deflector')
-      @deck << Card.new('ffffff')
-      @deck << Card.new('fireball')
-      @deck << Card.new('flipper')
-      @deck << Card.new('garbage man')
-      @deck << Card.new('it\'s getting windy')
-      @deck << Card.new('multi-ball')
-      @deck << Card.new('rocket lawn chair')
-      @deck << Card.new('shifty business')
-      @deck << Card.new('the bees')
-      @deck << Card.new('whirlwind')
-      @deck << Card.new("you're your grandfather")
+    Card::DECK.each_pair do |name, attrs|
+      attrs[:qty].times { @deck << Card.new(name) }
     end
     @deck.shuffle!
   end
