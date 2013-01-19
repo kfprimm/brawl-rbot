@@ -14,169 +14,243 @@ class Brawl
   MAX_HP = 10
 
   class Card
+    COLOR = { counter: Irc.color(:white,:black), attack: Irc.color(:yellow,:black), unstoppable: Irc.color(:olive,:black), support: Irc.color(:teal,:black), power: Irc.color(:brown,:black) }
 
-    attr_reader :name, :health, :skips, :string, :type
+    DECK = { 
+      'block'                    => { type: :counter,
+                                      display: 'Block', 
+                                      string: "%{p} blocks %{o}'s %{c}.",
+                                      help: "Block a basic attack card when played against you. Can be used against a grab to nullify the grab's proceeding attack."
+                                    },
+                          
+      'dodge'                    => { type: :counter,
+                                      display: 'Dodge', 
+                                      string: "%{p} dodges %{o}'s %{c}.",
+                                      help: "Similar to a block, but the attack is passed onto the next player. Cannot counter a grab.",
+                                      regex: /wet( pillow)?/
+                                    },
+                          
+      'grab'                     => { type: :counter,
+                                      display: 'Grab',
+                                      string: "%{p} grabs %{o}. Respond or pass, %{o}.",
+                                      help: "Play this as a counter so you can attack back. This cannot be dodged. Also note this can be played before an attack to disguise your type of attack.", 
+                                      regex: /credit( feed)?/
+                                    },
+                          
+      'wet_pillow'               => { type: :counter, 
+                                      health: 2,
+                                      display: 'Wet Pillow', 
+                                      string: "The wet pillow descends from heaven to shield %{p}.",
+                                      help: "Can only be used against a blockable killing blow. Resets you to 5 health points."
+                                    },
+                          
+      'credit_feed'              => { type: :counter, 
+                                      health: 5,
+                                      display: 'Credit Feed', 
+                                      string: "%{p} feeds me some credits and is restored to 5 health!",
+                                      help: "This does no damage, but your opponent must spend 2 turns in therapy."
+                                    },
+                          
+      'roach_approach'           => { type: :attack,
+                                      skips: 2,
+                                      display: 'Roach Approach',
+                                      string: "%{p} psychologically devastates %{o} with a Roach approach.", 
+                                      regex: /roach( approach)?/ },
+                          
+      'broken heart'             => { type: :attack,
+                                      health: -2,
+                                      skips: 1,
+                                      string: "%{o} watches Jurassic Bark. :'(",
+                                      help: "Opponent must watch Jurassic Bark, lose 2 health, and a turn.", 
+                                      regex: [ /broken( heart)?/, /jurr*ass*ic( ?bark)?/, 'heart', 'bark' ]
+                                    },
+                          
+      'gutpunch'                 => { type: :attack,
+                                      health: -2,
+                                      string: "A wild TODD appears and gutpunches %{o}.",
+                                      help:  'Basic TODD-inspired technique.',
+                                      regex: [ /gut( ?punch)?/, 'punch' ]
+                                    },
+
+      'chihiro'                  => { type: :attack,
+                                      health: -3,
+                                      skips: 1,
+                                      string: "Chihiro claws %{o} in an excited rage. She pees a little.",
+                                      help: "Chihiro claws your opponent in an excited rage. She pees a little. Opponent loses a turn to clean it up."
+                                    },
+        
+      'neck punch'               => { type: :attack,
+                                      health: -3,
+                                      string: "%{p} delivers %{o} a punch in the neck.",
+                                      help: "Slightly more powerful attack directed at the neck of your opponent.",
+                                      regex: /neck( ?punch)?/
+                                    },
+
+      'kickball'                 => { type: :attack,
+                                      health: -4,
+                                      string: lambda { "%{p} delivers %{o}'s %s a swift kick." %  [ "toolbox", "mulberry bush", "weed whacker", "particle accelerator", "anodes", "anchors", "Jimmy Deans", "coat rack", "balls" ].sample },
+                                      regex: /kick( ?ball)?/,
+                                      help: "#{y}Kickball#{c} (-4) - Major damage due to a swift kick in the balls. Can be used on players that don't have balls."
+                                    },
+
+      'touch'                    => { type: :attack,
+                                      health: -5,                                      
+                                      string: "%{o} receives a touch from LordKaT.",
+                                      regex: 'touch',
+                                      help: "#{y}Touch#{c} (-5) - LordKaT appears to deliver an ultimate attack."
+                                    },
+
+      'slot machine'             => { type: :attack,
+                                      string: "Next time stick to the pachinkos, %{o}.",
+                                      regex: [ /slot( ?machine)?/, 'machine' ],
+                                      help: "#{o}Slot Machine#{c} (-0 to -9) - Spits out three random attack values from 0 to 3. Attack does the sum of the three numbers. Can't be blocked."
+                                    },
+
+      'looke out'                => { type: :unstoppable,
+                                      skips: 1,
+                                      string: "%{o} catches word of Looke is coming to town and decides to wait around.",
+                                      regex: /looke( ?out)?/,
+                                      help: "#{o}Looke Out#{c} (-0) - Looke's in town! He Says he's going to visit. Opponent loses a turn to wait for him. (He never comes.)"
+                                    },
+
+      'danger zone'              => { type: :unstoppable,
+                                      health: -1,
+                                      skips: -1,
+                                      string: "%{p} leaves Danger Zone on repeat and forever ruins %{o}'s last.fm profile.",
+                                      regex: [ /danger( ?zone)?/, 'zone' ],
+                                      help: "#{o}Danger Zone#{c} (-1) - Roach scrobbles Danger Zone 570 times on your opponent's computer and now their music libraries are SUPER."
+                                    },
+
+      'a gun'                    => { type: :unstoppable,
+                                      health: -2,
+                                      string: "%{p} shoots %{o} in the FACE.",
+                                      regex: /(a ?)gun/,
+                                      help: "#{o}A Gun#{c} (-2) - Can't dodge a gun. Simple as that."
+                                    },
+
+      'rocket lawn chair'        => { type: :unstoppable,
+                                      health: -3,
+                                      string: "%{p} blows up %{o} with a Rocket Lawn Chair.",
+                                      regex: [ /rocket(( ?lawn)? ?chair)?/, 'lawn', 'chair' ],
+                                      help: "#{o}Rocket Lawn Chair#{c} (-3) - Still not as good as shotgun."
+                                    },
+      
+      'flipper'                  => { type: :unstoppable,
+                                      string: lambda { rand(2) == 0 ? "%{p} flips over the table, knocking all the cards out of %{o}'s hand." 
+                                                                    : "%{p} violently SLAPS the cards out of %{o}'s hand for no raisin." },
+                                      regex: /flippers?/,
+                                      help: "#{o}Flipper#{c} (-0) - Opponent drops all their cards and draws new ones."
+                                    },
+
+      'garbage man'              => { type: :unstoppable,
+                                      string: "%{p} dumps a bunch of garbage cards on %{o}.",
+                                      regex: [ /garbage( ?man)?/, 'man' ],
+                                      help: "#{o}Garbage Man#{c} (-0) - Give a player all your cards you don't want. The opponent won't get any new cards until they manage to get their hand below 5 cards again."
+                                    },
+
+      'heal steal'               => { type: :unstoppable,
+                                      string: "%{p} rummages through %{o}'s hand for DDP and peelz." ,
+                                      regex: [ /peel( ?steal)?/, 'steal' ],
+                                      help: "#{o}Heal Steal#{c} (+0 to +#{MAX_HP-1}) - Steal all of an opponent's DDP and peels, if he has any, and use them on yourself."
+                                    },
+
+      'ddp'                      => { type: :support,
+                                      health: 1,
+                                      string: "%{p} takes a sip of DDP, relaxes.",
+                                      help: "Take a sip. Relax. Gain health."
+                                    },
+
+      'peelz'                    => { type: :support,
+                                      health: 2,
+                                      string: "%{p} peel'd up!",
+                                      regex: /peel(s|z)/,
+                                      help: "#{t}Peelz#{c} (+2) - Heal yourself by 2 points, up to a maximum of #{MAX_HP}. Can be played instead of attacking."
+                                    },
+                 
+      'armor'                    => { type: :support,
+                                      health: 5,
+                                      string: "%{p} buckles on some armor.",
+                                      regex: 'armor',
+                                      help: "Adds 5 extra points to your health on top of your maximum. Your main HP will be protected until the armor is depleted."
+                                    },
+
+      'white wedding'            => { type: :support,
+                                      health: MAX_HP - 1,
+                                      string: "It's a nice day to... START AGAIN!!! HEALTH RESTORED!!!",
+                                      regex: [ /white( ?wedding)?/, 'wedding' ],
+                                      help: "It's a nice day to... START AGAIN!!!! HEALTH RESTORED!!! (can only be used if you have exactly 1 health remaining)"
+                                    },
+
+      'deflector'                => { type: :power,
+                                      string: "%{p} raises a deflector shield!",
+                                      regex: /deflect(ed|or|ing|s)?/,
+                                      help: "Next attack played against you hurts a random player that isn't you."
+                                    },
+
+      'ffffff'                   => { type: :power,
+                                      health: -6,
+                                      string: "%{p} randomly inflicts 6 damage on %{o}. What a dick!" ,
+                                      regex: /f+/,
+                                      help: "#{b}FFFFFF#{c} - Inflicts 6 damage to a random player (including you)."
+                                    },
+
+      'fireball'                 => { type: :power,
+                                      health: -1,
+                                      string: "%{p} drops a fireball on everyone."
+                                    },
+
+      'it\'s getting windy'      => { type: :power,
+                                      string: "%{p} turns up the ceiling fan too high and blows up  a gust! Every player passes a random card forward.",
+                                      regex: [ /it\'?s(( ?getting)? ?windy)?/, 'getting', 'windy' ],
+                                      help: "#{b}It's Getting Windy#{c} - All players choose a random card from the player previous to them."
+                                    },
+
+      'multi-ball'               => { type: :power,
+                                      string: "%{p} lites multi-ball.",
+                                      regex: [ /multi-?( ?ball)?/, 'ball' ],
+                                      help: "#{b}Multi-ball#{c} - Take an extra turn after your turn."
+                                    },
+
+      'shifty business'          => { type: :power,
+                                      string: "%{p} swaps hands with %{o}!",
+                                      regex: [ /shifty( ?business)?/, 'business' ],
+                                      help: "#{b}Shifty Business#{c} - Swap hand cards with a random player."
+                                    },
+
+      'the bees'                 => { type: :power,
+                                      string: "%{p} drops the bee cage on %{o}'s head...",
+                                      regex: [ /the( ?bee*s)?/, 'bee*s' ],
+                                      help: "#{b}THE BEES#{c} - Random player is stung by bees and must do their best Nicholas Cage impression. Also, -1 health every turn until player uses a support card."
+                                    },
+
+      'whirlwind'                => { type: :power,
+                                      string: "FEEL THE POWER OF THE WIND",
+                                      help: "Every player shifts the cards in their hands over to the player beside them."
+                                    },
+                     
+      'you\'re your grandfather' => { type: :power,
+                                      string: "%{p} reverses the table!",
+                                      regex: [ /you('?re|r)(( ?you('?re|r))?( ?grand(father|pa))?)?/, /grand(father|pa)/ ],
+                                      help: "#{b}You're Your Grandfather#{c} - Time is moving backwards! REVERSE playing order."
+                                    },
+    }  
+
+    attr_reader :name, :display, :health, :skips, :string, :type
 
     def initialize(id)
-      @name = id.downcase
-      case @name
-      when 'block'
-        @type = :counter
-        @string = "%{p} blocks %{o}'s %{c}."
-      when 'dodge'
-        @type = :counter
-        @string = "%{p} dodges %{o}'s %{c}."
-      when 'grab'
-        @type = :counter
-        @string = "%{p} grabs %{o}. Respond or pass, %{o}."
-      when 'wet pillow'
-        @type = :counter
-        @health = 2
-        @string = "The wet pillow descends from heaven to shield %{p}."
-      when 'credit feed'
-        @type = :counter
-        @health = 5
-        @string = "%{p} feeds me some credits and " +
-                  "is restored to #{@health} health!"
-      when 'roach approach'
-        @type = :attack
-        @string = "%{p} psychologically devastates %{o} with a Roach approach."
-        @skips = 2
-      when 'broken heart'
-        @type = :attack
-        @health = -2
-        @string = "%{o} watches Jurassic Bark. :'("
-        @skips = 1
-      when 'gutpunch'
-        @type = :attack
-        @health = -2
-        @string = "A wild TODD appears and gutpunches %{o}."
-      when 'chihiro'
-        @type = :attack
-        @health = -3
-        @string = "Chihiro claws %{o} in an excited rage. She pees a little."
-        @skips = 1
-      when 'neck punch'
-        @type = :attack
-        @health = -3
-        @string = "%{p} delivers %{o} a punch in the neck."
-      when 'kickball'
-        @type = :attack
-        @health = -4
-        innuendo = [ "toolbox", "mulberry bush", "weed whacker", 
-                     "particle accelerator", "anodes", "anchors",
-                     "Jimmy Deans", "coat rack", "balls"
-                   ]
-        @string = "%{p} delivers %{o}'s #{innuendo.sample} a swift kick."
-      when 'touch'
-        @type = :attack
-        @health = -5
-        @string = "%{o} receives a touch from LordKaT."
-      when 'slot machine'
-        @type = :attack
-        @string = "Next time stick to the pachinkos, %{o}."
-      when 'looke out'
-        @type = :unstoppable
-        @string = "%{o} catches word of Looke is coming " +
-                  "to town and decides to wait around."
-        @skips = 1
-      when 'danger zone'
-        @type = :unstoppable
-        @health = -1
-        @string = "%{p} leaves Danger Zone on repeat and " +
-                  "forever ruins %{o}'s last.fm profile."
-        @skips = -1
-      when 'a gun'
-        @type = :unstoppable
-        @health = -2
-        @string = "%{p} shoots %{o} in the FACE."
-      when "rocket lawn chair"
-        @type = :unstoppable
-        @health = -3
-        @string = "%{p} blows up %{o} with a Rocket Lawn Chair."
-      when 'flipper'
-        @type = :unstoppable
-        case rand(2)
-        when 0
-          @string = "%{p} flips over the table, knocking " +
-                    "all the cards out of %{o}'s hand."
-        when 1
-          @string = "%{p} violently SLAPS the cards " +
-                    "out of %{o}'s hand for no raisin."
-        end
-      when 'garbage man'
-        @type = :unstoppable
-        @string = "%{p} dumps a bunch of garbage cards on %{o}."
-      when 'heal steal'
-        @type = :unstoppable
-        @string = "%{p} rummages through %{o}'s hand for DDP and peelz."
-      when 'ddp'
-        @type = :support
-        @health = 1
-        @string = "%{p} takes a sip of DDP, relaxes."
-      when 'peelz'
-        @type = :support
-        @health = 2
-        @string = "%{p} peel'd up!"
-      when 'armor'
-        @type = :support
-        @health = 5
-        @string = "%{p} buckles on some armor."
-      when 'white wedding'
-        @type = :support
-        @health = MAX_HP - 1
-        @string = "It's a nice day to... START AGAIN!!! HEALTH RESTORED!!!"
-      when 'deflector'
-        @type = :power
-        @string = "%{p} raises a deflector shield!"
-      when 'ffffff'
-        @type = :power
-        @health = -6
-        @string = "%{p} randomly inflicts 6 damage on %{o}. What a dick!"
-      when 'fireball'
-        @type = :power
-        @health = -1
-        @string = "%{p} drops a fireball on everyone."
-      when 'it\'s getting windy'
-        @type = :power
-        @string = "%{p} turns up the ceiling fan too high and blows up " +
-                  "a gust! Every player passes a random card forward."
-      when 'multi-ball'
-        @type = :power
-        @string = "%{p} lites multi-ball."
-      when 'shifty business'
-        @type = :power
-        @string = "%{p} swaps hands with %{o}!"
-      when 'the bees'
-        @type = :power
-        @string = "%{p} drops the bee cage on %{o}'s head..."
-      when 'whirlwind'
-        @type = :power
-        @string = "FEEL THE POWER OF THE WIND"
-      when 'you\'re your grandfather'
-        @type = :power
-        @string = "%{p} reverses the table!"
-      else
-        raise 'Invalid card name.'
-        return
-      end
-      @health = 0 if @health.nil?
-      @skips = 0 if @skips.nil?
+      @name     = id.downcase#.gsub(' ', '_').to_sym
+      
+      raise 'Invalid card name.' if DECK[@name].nil?
+      
+      @display = DECK[@id][:display]
+      @health  = DECK[@id][:health] || 0
+      @skips   = DECK[@id][:skips]  || 0
+      @string  = DECK[@id][:string].is_a?(String) ? DECK[@id][:string] : DECK[@id][:string].call
+      @type    = DECK[@id][:type]
     end
 
     def color
-      case type
-      when :counter
-        Irc.color(:white,:black)
-      when :attack
-        Irc.color(:yellow,:black)
-      when :unstoppable
-        Irc.color(:olive,:black)
-      when :support
-        Irc.color(:teal,:black)
-      when :power
-        Irc.color(:brown,:black)
-      end
+      COLOR[type]
     end
 
     def to_s
@@ -985,7 +1059,7 @@ class Brawl
       bees = if player.bees then -1 else 0 end
       ensuing_health = player.health + opponent.discard.health + bees
       unless ensuing_health < 1 and not player.deflector
-        notify player, "You can only credit feed as " +
+        notify player, "You can only #{c[0].display} as " +
                        "a last resort before death."
         return
       end
@@ -1174,101 +1248,22 @@ class BrawlPlugin < Plugin
       "#{prefix}#{plugin} stats nick (network-wide stats) - " +
       "#{prefix}#{plugin} stats #channel nick (channel-specific stats) - " +
       "#{prefix}#{plugin} top (top 5 players)"
-    when 'block'
-      "#{w}Block#{c} - Block a basic attack card when played against you. " +
-      "Can be used against a grab to nullify the grab's proceeding attack."
-    when 'dodge'
-      "#{w}Dodge#{c} - Similar to a block, but the attack " +
-      "is passed onto the next player. Cannot counter a grab."
-    when 'grab'
-      "#{w}Grab#{c} - Play this as a counter so you can attack back. " +
-      "This cannot be dodged. Also note this can be played before " +
-      "an attack to disguise your type of attack."
-    when /wet( pillow)?/, 'pillow'
-      "#{w}Wet Pillow#{c} - Reduces opponent's attack by 2 points."
-    when /credit( feed)?/, 'feed'
-      "#{w}Credit Feed#{c} - Can only be used against a " +
-      "blockable killing blow. Resets you to 5 health points."
-    when /roach( approach)?/, 'approach'
-      "#{y}Roach Approach#{c} (-0) - This does no damage, " +
-      "but your opponent must spend 2 turns in therapy."
-    when /broken( heart)?/, /jurr*ass*ic( ?bark)?/, 'heart', 'bark'
-      "#{y}Broken Heart#{c} (-2) - Opponent must watch " +
-      "Jurassic Bark, lose 2 health, and a turn."
-    when /gut( ?punch)?/, 'punch'
-      "#{y}Gutpunch#{c} (-2) - Basic TODD-inspired technique."
-    when 'chihiro'
-      "#{y}Chihiro#{c} (-3) - Chihiro claws your opponent in an excited " +
-      "rage. She pees a little. Opponent loses a turn to clean it up."
-    when /neck( ?punch)?/
-      "#{y}Neck Punch#{c} (-3) - Slightly more powerful " +
-      "attack directed at the neck of your opponent."
-    when /kick( ?ball)?/
-      "#{y}Kickball#{c} (-4) - Major damage due to a swift kick " +
-      "in the balls. Can be used on players that don't have balls."
-    when 'touch'
-      "#{y}Touch#{c} (-5) - LordKaT appears to deliver an ultimate attack."
-    when /looke( ?out)?/
-      "#{o}Looke Out#{c} (-0) - Looke's in town! He Says he's going " +
-      "to visit. Opponent loses a turn to wait for him. (He never comes.)"
-    when /danger( ?zone)?/, 'zone'
-      "#{o}Danger Zone#{c} (-1) - Roach scrobbles Danger Zone 570 times " +
-      "on your opponent's computer and now their music libraries are SUPER."
-    when /(a ?)gun/
-      "#{o}A Gun#{c} (-2) - Can't dodge a gun. Simple as that."
-    when /rocket(( ?lawn)? ?chair)?/, 'lawn', 'chair'
-      "#{o}Rocket Lawn Chair#{c} (-3) - Still not as good as shotgun."
-    when /flippers?/
-      "#{o}Flipper#{c} (-0) - Opponent drops " +
-      "all their cards and draws new ones."
-    when /garbage( ?man)?/, 'man'
-      "#{o}Garbage Man#{c} (-0) - Give a player all your cards " +
-      "you don't want. The opponent won't get any new cards until " +
-      "they manage to get their hand below 5 cards again."
-    when /heal( ?steal)?/, 'steal'
-      "#{o}Heal Steal#{c} (+0 to +#{MAX_HP-1}) - Steal all of an " +
-      "opponent's DDP and peels, if he has any, and use them on yourself."
-    when /slot( ?machine)?/, 'machine'
-      "#{o}Slot Machine#{c} (-0 to -9) - Spits out three " +
-      "random attack values from 0 to 3. Attack does the " +
-      "sum of the three numbers. Can't be blocked."
-    when 'ddp'
-      "#{t}DDP#{c} (+1) - Take a sip. Relax. Gain health."
-    when /peel(s|z)/
-      "#{t}Peelz#{c} (+2) - Heal yourself by 2 points, up to a " +
-      "maximum of #{MAX_HP}. Can be played instead of attacking."
-    when 'armor'
-      "#{t}Armor#{c} (+5) - Adds 5 extra points to your " +
-      "health on top of your maximum. Your main HP will " +
-      "be protected until the armor is depleted."
-    when /white( ?wedding)?/, 'wedding'
-      "#{t}White Wedding#{c} (#{MAX_HP-1}) - It's a nice day " +
-      "to... START AGAIN!!!! HEALTH RESTORED!!! (can only " +
-      "be used if you have exactly 1 health remaining)"
-    when /deflect(ed|or|ing|s)?/
-      "#{b}Deflector#{c} - Next attack played " +
-      "against you hurts a random player that isn't you."
-    when /f+/
-      "#{b}FFFFFF#{c} - Inflicts 6 damage " +
-      "to a random player (including you)."
-    when /it\'?s(( ?getting)? ?windy)?/, 'getting', 'windy'
-      "#{b}It's Getting Windy#{c} - All players choose " +
-      "a random card from the player previous to them."
-    when /multi-?( ?ball)?/, 'ball'
-      "#{b}Multi-ball#{c} - Take an extra turn after your turn."
-    when /shifty( ?business)?/, 'business'
-      "#{b}Shifty Business#{c} - Swap hand cards with a random player."
-    when /the( ?bee*s)?/, 'bee*s'
-      "#{b}THE BEES#{c} - Random player is stung by bees and " +
-      "must do their best Nicholas Cage impression. Also, " +
-      "-1 health every turn until player uses a support card."
-    when 'whirlwind'
-      "#{b}Whirlwind#{c} - Every player shifts the cards " +
-      "in their hands over to the player beside them."
-    when /you('?re|r)(( ?you('?re|r))?( ?grand(father|pa))?)?/, /grand(father|pa)/
-      "#{b}You're Your Grandfather#{c} - Time is " +
-      "moving backwards! REVERSE playing order."
     else
+      Brawl::Card::DECK.each_pair do |name, attrs|
+        regexes = attrs[:regex] || []
+        regexes = [regexes] unless regexes.is_a?(Array)
+        
+        regexes << name
+        
+        regexes.each do |regex|
+          color  = Brawl::Card::COLOR[attrs[:type]]
+          name   = attrs[:display]
+          health = attrs[:health].nil? ? nil : " (" + attrs[:health] + ")"
+          help   = attrs[:help]
+          return [color, name, c, health, ' - ', help].join if topic.downcase.match(regex)
+        end
+      end      
+      
       "Brawl help topics: commands, objective, stats, " +
       "#{Bold}Rules:#{Bold} attacking, attacked, cards, grabbing"
     end
